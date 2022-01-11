@@ -127,3 +127,5 @@ http.createServer((req, res) => {
 ## 感想
 
 JS 的执行，总让我联想到 CPU，程序被打断成一截一截的，每个 await、setTimeout、IO 操作，都会被插入其他代码执行。这个过程反直觉，相对于直接多线程编程，很难说 event-loop 是一个好的抽象，毕竟，一个好的抽象，是减少关注，也能用好功能。可是 event-loop，不了解这个抽象咋做的，压根用不好，很多出乎意料的表现，比如经典的 console.log 打印不出当前值，都在倒逼每个 JS 开发者拨开 event-loop，不然它也不会成为一个经典的面试题。
+
+我的博客即将同步至腾讯云+社区，邀请大家一同入驻：https://cloud.tencent.com/developer/support-plan?invite_code=o70m2h8p2np3
