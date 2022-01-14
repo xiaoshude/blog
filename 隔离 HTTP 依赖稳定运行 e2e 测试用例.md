@@ -317,7 +317,7 @@ d
 type ListResponse = typeof mockData['/ws/district/v1/list'].get.e4473f2e67634485d3b6defd93a502f1.response;
 ```
 
-最后附上完整实现：
+最后附上完整实现：https://github.com/xiaoshude/node-common
 
 ### 扩展
 
