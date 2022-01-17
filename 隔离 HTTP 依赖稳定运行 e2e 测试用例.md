@@ -25,7 +25,7 @@ graph TD
 
 这里把问题聚焦在 Node 应用，隔离其他 HTTP 依赖，稳定运行每个接口的测试用例。
 
-Node 服务用户登录接口测试的例子：
+用户登录接口测试的例子：
 
 ```js
 describe('user', () => {
@@ -64,7 +64,7 @@ describe('user', () => {
 
 > 例子说明：userLogin 调用了 Node 服务提供的用户登录接口，Node 服务会执行一些数据校验和预处理，然后调用另一个 HTTP API 执行登录。
 
-我们发现，用户登录接口，有多种入参的可能，也对应不同的表现。隔离用户登录接口背后的 HTTP API(用 Dep0 指代)，需要：记录 Dep0 的多条请求和返回记录，并和对应用例匹配。
+我们发现，用户登录接口，有多种入参的可能，也对应不同的表现。隔离 Node server 登录接口背后依赖的外部 HTTP API(用 Dep0 指代)，需要：记录 Dep0 的多条请求和返回记录，并和对应用例匹配。
 
 所以这里的问题是：
 
@@ -161,7 +161,7 @@ export function getFilePathFromConfig(config: AxiosRequestConfig): string {
 ```
 
 这里有一个需要注意的地方：
-如何根据请求入参，计算出一个标识，在请求返回后，能够根据 response 再次计算出同样的标识，只有这样，才能把一次 HTTP 的请求和响应对应起来。完成这个功能函数就是上面的 getHashFromConfig：
+如何根据请求入参，计算出一个标识，在请求返回后，能够根据 response 再次计算出同样的标识，只有这样，才能把一次 HTTP 的请求和响应对应起来。完成这个功能的函数就是上面的 getHashFromConfig：
 
 ```js
 function getHashFromConfig(config: AxiosRequestConfig): string {
@@ -181,7 +181,7 @@ function getHashFromConfig(config: AxiosRequestConfig): string {
 
 这里没有直接对 AxiosRequestConfig 求 hash，而是仅提取其中几个关键字段 hash。因为测试中发现：
 
-response 的 config 在请求前后，会存在字符串级别的不一致，比如 header。
+response 的 config 在请求前后，会存在字符串级别的不一致。
 
 执行后记录的结果：
 
@@ -259,7 +259,7 @@ mockedRequest.interceptors.request.use((config) => { const { url, method } = con
     filePath: getFilePathFromConfig(config),
     pathname,
     method,
-  }; // <- this will stop request and trigger
+  }; // <- this will stop request
 });
 
 mockedRequest.interceptors.response.use(
@@ -289,9 +289,9 @@ mockedRequest.interceptors.response.use(
 );
 ```
 
-这里利用了 axios request interceptor 会终止请求的特性，重定向到读取本地记录的数据。
+这里利用了 axios request interceptor throw 会终止请求的特性，重定向到读取本地记录的数据。
 
-最后加上根据环境变量自动切 mock 和录制：
+最后加上根据环境变量自动切是否执行录制：
 
 ```js
 // 用环境变量 RECORD，开启记录模式
