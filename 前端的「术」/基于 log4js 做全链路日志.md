@@ -67,7 +67,7 @@ trace id 属于请求的附加信息，一般放在 header 中。
 
 ### 日志的储存和检索
 
-最简单是文件储存，但是不利于后续检索和分析。
+把日志直接文件储存最简单，但是不利于后续合并检索和分析。
 这里我们可以借助开源工具，比如经典的 [ELK](https://www.elastic.co/what-is/elk-stack)，包含日志搜集、储存和可视化。
 如果腾讯云，可以使用 LogListener 搜集日志，对接 cls 日志服务，一站式完成容器日志搜集、储存、可视化。
 
@@ -101,7 +101,6 @@ log4js.configure({
   appenders: {
     global: {
       type: 'dateFile',
-      // 防止 mac 本地开发，没有文件权限
       filename: 'logs/global',
       pattern: '.yyyy-MM-dd.log',
       alwaysIncludePattern: true,
@@ -122,7 +121,6 @@ log4js.configure({
 
 这里可同时配置多个 appender，比如输出到机器人告警，感兴趣可以参考之前的一篇文章 [解决告警轰炸的一种实现](https://zhuanlan.zhihu.com/p/459166200)。
 
-
 2. 每个请求获取一个新的 logger 实例，并附加 trace id
 
 ```js
@@ -133,11 +131,11 @@ import { getLogger } from 'log4js';
 const app = new Koa();
 app.use(async (ctx, next) => {
   // 每个请求都要一个新的 logger 实例，以便有一个全新的 log context；
-  // 同时挂载 ctx 上，方便取用
+  // logger 实例同时挂载 ctx 上，方便取用
   if (!ctx.logger) ctx.logger = getLogger();
   // 添加 trace id
   const traceId = ctx.get('X-Request-Id') || uuidv4();
-  // 附加的 logger 的 context 上，这样后续每个 log 都会携带 trace id
+  // 附加 trace id 到 logger 的 context 上，这样后续每个 log 都会携带 trace id
   ctx.logger.addContext('trace', traceId);
   // 同时附加请求的 path 
   ctx.logger.addContext('path', ctx.request.path);
@@ -163,9 +161,9 @@ router.get('/api/test', async (ctx) => {
 });
 ```
 
-`ctx.logger.debug('hello')` 的调用不单单是向日志文件输入 hello 的字符串，因为签名定义的 json layout，输出时会附加 logger 的 context，最终类似开头的 json 字符串。
+`ctx.logger.debug('hello')` 的调用不单单是向日志文件输入 hello 的字符串，因为前面定义的 json layout，输出时会附加 logger 的 context，最终类似开头的 json 字符串。
 
-这里一个稍微麻烦的地方：任何打日志的地方，都要透传 logger 实例。优化办法可以参考之前的一篇文章 [如何用domain减少logger的传递](https://zhuanlan.zhihu.com/p/457472209)
+稍微麻烦的地方：任何打日志的函数，都要透传 logger 实例。优化办法可以参考之前的一篇文章 [如何用domain减少logger的传递](https://zhuanlan.zhihu.com/p/457472209)
 
 4. 打日志的时机
 
@@ -181,11 +179,11 @@ router.get('/api/test', async (ctx) => {
 可以统一为：任何网络通信前后，必须 log。
 
 MYSQL 或其他储存依赖，根据实际场景打 log。
-一般认为这些储存库不像 RPC 调用，一般无执行 BUG，只能是入参有问题，入参的问题根据异常就可以定位了。
+这些储存库不像 RPC 调用，一般无执行 BUG，只能是入参有问题，入参的问题根据异常就可以定位了。
 
 5. 配置 logListener 搜集指定文件的日志
 
-如果没有，创建一个日志主题，一般按日志的结构建主题即可：
+如果没有，创建一个日志主题，一般按应用建主题即可：
 ![](2022-01-20-12-27-09.png)
 
 配置日志文件采集路径：
@@ -197,12 +195,12 @@ MYSQL 或其他储存依赖，根据实际场景打 log。
 
 配置日志索引，可以类比为设计 MYSQL 表结构。
 
-因为日志是 json 结构，所以可以直接根据日志推到 schema，自动配置日志索引：
+因为日志是 json 结构，可以直接根据日志数据推到 schema，自动配置日志索引：
 ![](2022-01-20-12-32-37.png)
 
 7. 检索日志
 
-配置完索引，我们就储存了结构化日志，可以根据字段愉快检索了。
+配置完索引，就储存了结构化日志，可以根据字段愉快检索了。
 
 ![](2022-01-20-12-35-43.png)
 
@@ -212,7 +210,7 @@ MYSQL 或其他储存依赖，根据实际场景打 log。
 
 全链路日志是问题定位的利器，不仅如此，结构化的日志还能聚合有价值的指标，比如成功率、耗时分布、甚至 DAU、区域分布（根据 ip）等。
 
-借助 log4js 实现全链路结构化日志记录，业务代码侵入小，并且保持了熟悉的打 log 方式。
+借助 log4js 记录全链路日志，业务代码侵入小，并且保持了熟悉的打 log 方式。
 
 ### 技术要点
 
@@ -224,6 +222,6 @@ MYSQL 或其他储存依赖，根据实际场景打 log。
 
 全链路日志就像调用栈：一个用户的 HTTP 请求，可能唤起另一个 RPC 调用、接着另一个...，如此形成一条「网络调用链」，就像函数的调用栈一样。
 
-并且现在已有开源工具把全链路日志可视化为调用栈，比如[Jaeger](https://www.jaegertracing.io/docs/1.30/)：
+并且现在已有开源工具，可以把全链路日志可视化为调用栈，比如[Jaeger](https://www.jaegertracing.io/docs/1.30/)：
 
 ![](2022-01-20-07-44-09.png)
