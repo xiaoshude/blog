@@ -41,7 +41,7 @@ ORM：Object-relational mapping，是把对象和关系型数据库建立映射�
 
 如果因为上面或其他原因，需要剥开 ORM 的抽象，继续下探，Query builder 是一个不错的过渡。
 
-## Middle level: Query builder
+### Middle level: Query builder
 
 比如 Node 中流行的 [Knex.js](https://knexjs.org/)。
 
@@ -49,7 +49,7 @@ ORM：Object-relational mapping，是把对象和关系型数据库建立映射�
 
 日常应用开发中，高频场景模式固定，存在大量 sql 片段在不同查询中重复。query builder 就是消除这种重复的辅助函数。
 
-## Low level: Database driver
+### Low level: Database driver
 
 这一层，也称为 raw sql。
 不管是因为 ORM 表现力不够，还是需要某种更底层的特性（直接控制connection pool?)，这时，[node-mysql2](https://github.com/sidorares/node-mysql2/tree/master/documentation) 是个不错的选择。
