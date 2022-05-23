@@ -15,11 +15,11 @@
 
 话说回来，有没有可能把 React 中的概念讲到 5 岁小孩都能听懂？
 
-let's try!
+Let's try!
 
 ## React 中的术语
 
-以下内容基本意译自 [Glossary + Explain Like I'm Five](https://github.com/reactwg/react-18/discussions/46)，强烈推荐原文也看看。
+以下内容基本意译自 [Glossary + Explain Like I'm Five](https://github.com/reactwg/react-18/discussions/46)，推荐原文也看看。
 
 ### 并发（CONCURRENCY）
 
