@@ -1,3 +1,4 @@
+#! https://zhuanlan.zhihu.com/p/531738816
 # TypeScript 最令人困惑的地方
 
 [<<写给大家看的 TypeScript 教程>>](https://xiaoshude.github.io/typescript-tutorial/)，从写下这个教程三年过去了，期间帮不少同事解决 TS 问题、解答使用中的困惑，发现疑问基本都集中在几个。
