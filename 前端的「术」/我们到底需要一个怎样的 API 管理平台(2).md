@@ -17,5 +17,7 @@ API 管理的现实状况就是：接口实现了，怎样以最小的代价出�
 核心诉求：接口实现了，怎样以最小的代价出来文档。
 核心功能：http/https/websocket/webrtc proxy。
 
+技术选项：https://github.com/avwo/whistle
+
 
 
